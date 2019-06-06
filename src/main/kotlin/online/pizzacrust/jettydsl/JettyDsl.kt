@@ -16,8 +16,7 @@ internal class AbstractHandlerBlock(val block: (Map<String, Array<String>>, Inet
 ServerResponse):
         AbstractHandler() {
     override fun handle(target: String?, baseRequest: Request?, request: HttpServletRequest?, response: HttpServletResponse?) {
-        val responseBlock = block(request!!.parameterMap, InetAddress.getByName(baseRequest!!
-                .localAddr))
+        val responseBlock = block(request!!.parameterMap, InetAddress.getByName(request.remoteHost))
         response?.status = responseBlock.response
         if (responseBlock.responseString != null) {
             response?.writer?.println(responseBlock.responseString)
