@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletResponse.SC_OK
 
 data class ServerResponse(val response: Int = SC_OK, val responseString: String? = null)
 
-internal class AbstractHandlerBlock(val block: (Map<String, Array<String>>, InetAddress) ->
+internal class AbstractHandlerBlock(val block: (Map<String, Array<String>>, HttpServletRequest) ->
 ServerResponse):
         AbstractHandler() {
     override fun handle(target: String?, baseRequest: Request?, request: HttpServletRequest?, response: HttpServletResponse?) {
-        val responseBlock = block(request!!.parameterMap, InetAddress.getByName(request.remoteHost))
+        val responseBlock = block(request!!.parameterMap, request)
         response?.status = responseBlock.response
         if (responseBlock.responseString != null) {
             response?.writer?.println(responseBlock.responseString)
@@ -29,7 +29,7 @@ class ServerConstructor {
 
     val paths: MutableList<ContextHandler> = mutableListOf()
 
-    fun path(path: String, block: (Map<String, Array<String>>, InetAddress) -> ServerResponse) {
+    fun path(path: String, block: (Map<String, Array<String>>, HttpServletRequest) -> ServerResponse) {
         val handler = ContextHandler()
         handler.contextPath = path
         handler.handler = AbstractHandlerBlock(block)
